@@ -1,0 +1,157 @@
+
+= EPO
+
+EPO is a no-brainer, plain-ruby file system database. If you have objects and
+need to store them in a clean hierarchy, then EPO is a good choice.
+EPO is not a good choice if you want to perform optimized queries or if you
+operate on big datasets.
+In EPO, each object has a directory, so, it is easy to use programs which write
+their output at a given file without using temp dirs.  Similarly, if you do
+lots of batch operations on your EPO's resources, the one-directory per
+resource approach scales well.
+
+== Philosophy
+
+EPO only is a small library, so summarizing it's philosophy takes only a few
+lines:
+* My filesystem already is a database
+* My database should be plain ruby and
+* But my database should be easy to use from non-ruby programs
+
+== The EPO hierarchy
+
+EPO tries to build from the lessons of KISS and REST routes.
+If you're familiar with REST applications, you will find EPO's hierarchy pretty
+straightforward.
+
+=== Important Rules
+
+Here are the simple rules for EPO's databases:
+* EPO operates on Welo::Resources
+* each resource has one directory
+* the directory's path identifies the resource stored
+* there is one serialization file per (resource, perspective, extension) tuple
+* any other file in the directory should not impact your ruby application, but may have meaning to other programs (e.g., a thumbnail created by your file-viewer)
+
+=== Examples
+
+If you have a resource "user" identified by its "login", if you have three
+users: peter, jon, and marc. 
+The database directories may look like the following. Between brackets are reference to further explanations.
+
+$ tree db/
+db/
+└── user
+    ├── peter
+    |   ├── resource-default.json  [1a]
+    |   └── picture.png            [1b]
+    ├── jon
+    |   ├── resource-default.json  [2a]
+    |   ├── picture.png            [2b]
+    |   └── pubkey.rsa.txt         [2c]
+    └── marc
+        ├── resource-default.json  [3a]
+        ├── picture.png            [3b]
+        └── thumbnail.dat          [3c]
+
+In the previous hierarchy, [1a, 2a, 3a] are the serialization of the user
+resources under the 'default' (or :default) perspective in the JSON format.
+The perspective is a concept of Welo's resource, which is basically a list of
+fields of an object that you want to dump or observe (an administrator may have
+access to more details than a mere, non-registered user).
+
+The other objects may or may not be related to your ruby application.  A
+convenient explanation may be: [1b, 2b, 3b] are pictures, most likely your
+user's headshots, uploaded by your users through your application.  User [2b]
+has given his public key, and we see that your filebrowser has created a
+thumbnail in [3c], which has nothing to do with your application.
+
+=== Attention
+
+The main thing to keep in mind is that filesystems come with a slight problem:
+file paths are strings.
+As a result, when designing your EPO hierarchy, you must be aware of:
+- encoding issues
+- case sensitivity
+- ambiguities with path separators 
+
+== Benefits
+
+Example of things you can do easily with EPO:
+* use a filesystem explorer to visualize/explore your DB
+* organize your documents without hassle
+* use bash scripts for batch processing
+* use rsync/NFS/git on all or part of your database's content
+* use ftp/http servers to expose a branch of your DB's hierarchy 
+* have other programs use your DB easily without configuring databases
+
+Say you have photos to sort. You may sort them by year, by place, by subject or
+other things. Some software propose you to tag your photos and build a database
+with these photos for you. Unfortunately, these softwares are often closed, you
+cannot re-use their database, or it requires lots of effort to script the
+software to do something it is not ready for (e.g., resize your pictures in a
+batch). Moreover, the file-viewer of your OS may be good enough to view your
+pictures.  Filesystems have solved many database issues since ages.  So, why
+not just rely on your file system to store your pictures? 
+
+== Usage (please have a look at the examples directory)
+
+=== EPO is simple
+There is no complex things in EPO, as an example, there is no:
+- index
+- transaction
+- thread/multiprocess safety
+- lifecycle hook
+If you want to add a missing feature, feel free to fork/subclass/add a module,
+or implement it directly on your filesystem.
+
+=== Theory
+
+EPO uses:
+* Derailleur's paths routing to quickly map paths to resources
+  (we may want to remove this dependency later)
+* Welo's observers to hook events when iterating on the filesystem
+
+EPO::DB are just simple, in-memory Ruby objects. 
+They have no connection to take care of, no credentials.
+
+An EPO::DB may understand several formats (json or yaml are standard choices).
+You may modify this by changing EPO::DB#extensions .
+
+EPO::DB are headless, in the sense that they don't store their hierarchy's root
+in a variable. As a result, an EPO::DB contains the concepts of the models but
+are not actually tied to the data on the filesystem.
+You may have two EPO::DB on the same filesystem's root (each understanding
+different resources or formats).
+
+=== Commented code bits
+
+Say you have two models (which are Welo::Resources): Person and Item.
+Both models must have a "identifying" named :flat_db (this is just a default convention).
+  class Person 
+    include Welo::Resource
+    identify :flat_db, [:name]
+    ...
+
+If you want to create a database only able to handle persons
+  EPO::DB.new([Person])
+
+Creates a database able to handle persons and items
+  db = EPO::DB.new([Person, Item])
+
+Saves a person with the default perspective, in all format
+  person = Person.new(...)
+  db.save(root, person)
+
+Iterates on all the DB items (as observations)
+  db.each_resource(root) { |observation| ... }
+
+== Dependencies
+
+welo >= 0.1.0
+derailleur >= 0.5.0
+a JSON library if you use json formatting
+
+== License
+
+The MIT license
