@@ -39,14 +39,7 @@ module EPO
       end
     end
 
-    # Read a single path, the root is the part of the path corresponding
-    # to where on the filesystem the database is rooted.
-    # e.g.  for a path in a photo collection:
-    #       /home/crapooze/project/foobar/db/photo/1
-    #       the root is likely to be:
-    #       /home/crapooze/project/foobar/db
-    # If a successful observation happens, then it will call the relevant hooks.
-    def read_path(path, root=nil)
+    def get_node_for_path(path, root=nil)
       full_dirname, base = File.split(path)
       dirname = if root
                   full_dirname.sub(root,'')
@@ -55,7 +48,23 @@ module EPO
                 end
       #XXX may raise an exception for unknown path, we should rescue this/use a
       #silent method and test for nil
-      node = db.get_route(dirname)
+      db.get_route_silent(dirname)
+    end
+
+    # Read a single path, the root is the part of the path corresponding
+    # to where on the filesystem the database is rooted.
+    # e.g.  for a path in a photo collection:
+    #       /home/crapooze/project/foobar/db/photo/1
+    #       the root is likely to be:
+    #       /home/crapooze/project/foobar/db
+    # If a successful observation happens, then it will call the relevant hooks.
+    def read_path(path, root=nil)
+      node = get_node_for_path(path, root)
+      return unless node
+      # if there is no such route, it means we may prune the branch
+      # if there is such a route but without content, it means we're on a directory of
+      # a branch understood by the DB
+      # XXX check for the root case
 
       persp_str = db.persp_and_ext_for_basename(path).first
       persp = node.content.perspectives.keys.find{|k| k.to_s == persp_str}

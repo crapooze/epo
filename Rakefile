@@ -31,7 +31,7 @@ spec = Gem::Specification.new do |s|
         s.executables = []
         s.has_rdoc = true
 
-        s.add_dependency('derailleur', '>= 0.0.5')
+        s.add_dependency('derailleur', '>= 0.0.6')
         s.add_dependency('welo', '>= 0.1.0')
 end
 

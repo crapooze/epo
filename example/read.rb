@@ -21,9 +21,7 @@ obs.on(Person) do |o|
 end
 obs.read_tree(root) 
 
-__END__
 #using another, limited DB
-#XXX will currently crash on Derailleur notfound
 EPO::DB.new([Person]).each_resource(root) do |o|
   p o
 end

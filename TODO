@@ -1,6 +1,5 @@
 * delete record/observation
 * maybe with some modifications to Derailleur:
-  - graceful not found case
   - clever pruning when finding:
     - when path is a directory and there is no node, prune
     - when path is a directory but there is a node, continue
