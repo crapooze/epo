@@ -1,6 +1,5 @@
 * delete record/observation
 * maybe with some modifications to Derailleur:
-  -don't try loading non-resources files
   -nesting
 * fiber-friendly batch operations
 * register on inotify events

@@ -75,20 +75,41 @@ module EPO
       extensions.find{|ext| ext == File.extname(path)}
     end
 
+    # Returns the main name of a path, i.e., the basename without
+    # the extension 
+    # * main_name('/a/b/c/foo.bar') #=> 'foo'
+    def main_name(path)
+      File.basename(path).sub(/\.[^\.]+$/,'')
+    end
+
+    def understands_filename?(path)
+      understands_ext?(path) and
+      understands_main_name?(path)
+    end
+
+    def understands_main_name?(path)
+      main_name(path) =~ resource_regexp
+    end
+
+    RESOURCE_REGEXP = %r{resource-epo-\w+}
+
+    def resource_regexp
+      RESOURCE_REGEXP
+    end
+
     # Returns the perspective name and extension name (a 2 items array)
     # for the given path.
     # By default the blobs for resources content are stored in files named
     # 'resource-<persp><ext>' with ext starting with a dot
     def persp_and_ext_for_basename(path)
-      base = File.basename(path).sub('resource-','').sub(/\.[^\.]+$/,'')
-      [base, File.extname(path)]
+      [main_name(path).sub('resource-epo-',''), File.extname(path)]
     end
 
     # Returns the basename of a resource blob for a perspective named persp and
     # in a format with extension ext (including the leading dot).  
     # see also persp_and_ext_for_basename
     def basename_for_persp_and_ext(persp, ext)
-      "resource-#{persp}#{ext}"
+      "resource-epo-#{persp}#{ext}"
     end
 
     # Saves one or more resource at the filesystem path given at root

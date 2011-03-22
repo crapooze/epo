@@ -67,7 +67,9 @@ module EPO
         node = get_node_for_path(path, root) 
         if node 
           if node.content #a model attached to a file in a directory
-            read_path_as_resource(path, node.content)
+            if db.understands_filename?(path)
+              read_path_as_resource(path, node.content)
+            end
           end
         else #the db doesn't understand this branch, we'd rather drop now
           Find.prune
