@@ -43,14 +43,14 @@ $ tree db/
 db/
 └── user
     ├── peter
-    |   ├── resource-default.json  [1a]
+    |   ├── resource-epo-default.json  [1a]
     |   └── picture.png            [1b]
     ├── jon
-    |   ├── resource-default.json  [2a]
+    |   ├── resource-epo-default.json  [2a]
     |   ├── picture.png            [2b]
     |   └── pubkey.rsa.txt         [2c]
     └── marc
-        ├── resource-default.json  [3a]
+        ├── resource-epo-default.json  [3a]
         ├── picture.png            [3b]
         └── thumbnail.dat          [3c]
 
@@ -150,7 +150,7 @@ Iterates on all the DB items (as observations)
 
 welo >= 0.1.0
 derailleur >= 0.5.0
-a JSON library if you use json formatting
+a JSON library if you use json formatting (recommended)
 
 == License
 
