@@ -152,6 +152,21 @@ welo >= 0.1.0
 derailleur >= 0.5.0
 a JSON library if you use json formatting (recommended)
 
+== Benchmark
+Config:
+* macbook pro (2010), without SSD:
+* ruby 1.9.2
+* json 1.5.1
+
+$ ruby example/benchmark.rb 
+  0.770000   1.020000   1.790000 (  4.563546)
+5935
+  1.160000   0.420000   1.580000 (  1.601897)
+
+So, roughly 5 seconds to write 6000 records, and 2 seconds to read them back.
+No sync operation nor cache flush was forced in between the results. That's maybe why
+we can read back only 5935 records out of 6000.
+
 == License
 
 The MIT license
