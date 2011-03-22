@@ -3,7 +3,6 @@
   - clever pruning when finding:
     - when path is a directory and there is no node, prune
     - when path is a directory but there is a node, continue
-  - cache observation structs somewhere in the db or in the observer
   - when storing a resource model, add * wildcard to the path model?
   -nesting
 * fiber-friendly batch operations
