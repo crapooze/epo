@@ -45,29 +45,13 @@ module EPO
 
     def get_node_for_path(path, root=nil)
       path = path.sub(root,'') if root
-      #XXX may raise an exception for unknown path, we should rescue this/use a
-      #silent method and test for nil
       db.get_route_silent(path)
     end
 
-    # Read a single path, the root is the part of the path corresponding
-    # to where on the filesystem the database is rooted.
-    # e.g.  for a path in a photo collection:
-    #       /home/crapooze/project/foobar/db/photo/1
-    #       the root is likely to be:
-    #       /home/crapooze/project/foobar/db
-    # If a successful observation happens, then it will call the relevant hooks.
-    def read_path(path, root=nil)
-      node = get_node_for_path(path, root)
-      return unless node
-      # if there is no such route, it means we may prune the branch
-      # if there is such a route but without content, it means we're on a directory of
-      # a branch understood by the DB
-      # XXX check for the root case
-
+    def read_path_as_resource(path, model)
       persp_str = db.persp_and_ext_for_basename(path).first
-      persp = node.content.perspectives.keys.find{|k| k.to_s == persp_str}
-      observe_source(Source.new(db, path), structure(node.content, persp))
+      persp = model.perspectives.keys.find{|k| k.to_s == persp_str}
+      observe_source(Source.new(db, path), structure(model, persp))
     end
 
     def structure(model, persp)
@@ -80,10 +64,13 @@ module EPO
     # Currently, there is no pruning, or control possible.
     def read_tree(root)
       Find.find(root) do |path|
-        if File.directory?(path)
-          #XXX maybe prune the branch if valid but has no content
-        elsif db.understands_ext?(path)
-          read_path(path, root) 
+        node = get_node_for_path(path, root) 
+        if node 
+          if node.content #a model attached to a file in a directory
+            read_path_as_resource(path, node.content)
+          end
+        else #the db doesn't understand this branch, we'd rather drop now
+          Find.prune
         end
       end
     end

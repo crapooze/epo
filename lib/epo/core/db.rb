@@ -39,7 +39,7 @@ module EPO
     # Registers a model on a derailleur node at its path_model
     # Does not modify self.models
     def build_route_for_model(model)
-      path = File.join(model.path_model(identifying_sym), '*')
+      path = File.join(model.path_model(identifying_sym), ':filename')
       node = build_route(path)
       node.content = model
     end
