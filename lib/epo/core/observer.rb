@@ -44,15 +44,10 @@ module EPO
     end
 
     def get_node_for_path(path, root=nil)
-      full_dirname, base = File.split(path)
-      dirname = if root
-                  full_dirname.sub(root,'')
-                else
-                  full_dirname
-                end
+      path = path.sub(root,'') if root
       #XXX may raise an exception for unknown path, we should rescue this/use a
       #silent method and test for nil
-      db.get_route_silent(dirname)
+      db.get_route_silent(path)
     end
 
     # Read a single path, the root is the part of the path corresponding
