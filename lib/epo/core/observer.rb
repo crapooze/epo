@@ -21,6 +21,9 @@ module EPO
     # The DB able to tell if a path is understandable or not
     attr_accessor :db
 
+    # A cache for the observation structures
+    attr_accessor :structures
+
     # Creates and return a new observer from a DB. 
     # It will take the models from the DB.
     def self.for_db(db)
@@ -34,6 +37,7 @@ module EPO
     def initialize(models=[])
       super(models)
       @db = DB.new(models)
+      @structures = {}
       register(:observation) do |o|
         dispatch(o)
       end
@@ -68,10 +72,12 @@ module EPO
 
       persp_str = db.persp_and_ext_for_basename(path).first
       persp = node.content.perspectives.keys.find{|k| k.to_s == persp_str}
-      #XXX no need to create this many time, should cache it
-      st = Welo::ObservationStruct.new_for_resource_in_perspective(node.content, persp)
-      source = Source.new(db, path)
-      observe_source(source, st)
+      observe_source(Source.new(db, path), structure(node.content, persp))
+    end
+
+    def structure(model, persp)
+      pair = [model, persp]
+      @structures[pair] ||= Welo::ObservationStruct.new_for_resource_in_perspective(model, persp)
     end
 
     # Recursively reads the files in the filesystem (with Find).
