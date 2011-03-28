@@ -1,5 +1,2 @@
-* delete record/observation
-* maybe with some modifications to Derailleur:
-  -nesting
-* fiber-friendly batch operations
+* nesting/epitheting resources
 * register on inotify events
