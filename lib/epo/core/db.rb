@@ -112,6 +112,44 @@ module EPO
       "resource-epo-#{persp}#{ext}"
     end
 
+    # Deletes a resource by removing its identifying directory.  Beware because
+    # this method doesn't care about other files which may coexist in the same
+    # filesystem branch.
+    def delete_completely(root, resource)
+      path = File.join(root, resource.path(identifying_sym))
+      FileUtils.rm_rf(path)
+
+      # removes the empty directories upward
+      (resource.identifiers(identifying_sym).size - 1).times do |t|
+        path = File.split(path).first
+        begin
+          FileUtils.rmdir(path)
+        rescue Errno::ENOTEMPTY
+          break
+        end
+      end
+    end
+
+    def delete(root, resource)
+      remaining_path = File.join(root, resource.path(identifying_sym))
+      # removes the resource-epo-* files
+      Dir.entries(remaining_path).each do |e|
+        if e.start_with?('resource-epo-')
+          FileUtils.rm(File.join(remaining_path, e)) 
+        end
+      end
+
+      # removes the empty directories upward
+      resource.identifiers(identifying_sym).size.times do |t|
+        begin
+          Dir.rmdir(remaining_path)
+          remaining_path = File.split(remaining_path).first
+        rescue Errno::ENOTEMPTY
+          break
+        end
+      end
+    end
+
     # Saves one or more resource at the filesystem path given at root
     # This method is mainly an handy helper around batch_save, look at the
     # source and at batch_save's doc
