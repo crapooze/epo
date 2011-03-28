@@ -230,7 +230,7 @@ module EPO
     # Iterates on every resource found and understood in the filesystem
     # directory root.
     # If no block is given, returns an iterator.
-    def each_resource(root) 
+    def each_resource_observation(root) 
       if block_given?
         xp = observer
         models.each do |model|
@@ -240,7 +240,7 @@ module EPO
         end
         xp.read_tree(root)
       else
-        Enumerator.new(self, :each_resource, root)
+        Enumerator.new(self, :each_resource_observation, root)
       end
     end
 

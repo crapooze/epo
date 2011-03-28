@@ -10,7 +10,7 @@ db = DB.new([Person, Item])
 root = './db'
 
 # enumerating on everything
-db.each_resource(root) do |o|
+db.each_resource_observation(root) do |o|
   p o
 end
 
@@ -22,6 +22,6 @@ end
 obs.read_tree(root) 
 
 #using another, limited DB
-EPO::DB.new([Person]).each_resource(root) do |o|
+EPO::DB.new([Person]).each_resource_observation(root) do |o|
   p o
 end

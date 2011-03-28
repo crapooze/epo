@@ -34,6 +34,6 @@ Benchmark.benchmark do |x|
     db.batch_save(root, resources, [:default], ['.json'])
   end
   x.report do
-    p db.each_resource(root).to_a.size
+    p db.each_resource_observation(root).to_a.size
   end
 end
