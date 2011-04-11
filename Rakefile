@@ -23,7 +23,6 @@ spec = Gem::Specification.new do |s|
           'lib/epo.rb',
           'lib/epo/core/db.rb',
           'lib/epo/core/observer.rb',
-          'lib/epo/core/dispatch_observations.rb',
         ]
 
         s.require_path = 'lib'
