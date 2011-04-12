@@ -185,7 +185,7 @@ module EPO
           end
         end
       else
-        Enumerator.new(self, root, resources, persps, exts)
+        Enumerator.new(self, :batch_save_actions, root, resources, persps, exts)
       end
     end
 
